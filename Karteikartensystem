@@ -1,0 +1,577 @@
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Button, RadioButtons, TextBox
+import random
+
+# Erklärung was das Programm macht
+def Einleitung():
+    plt.figure("Karteikartensystem für Verkehrswegebau")
+    plt.axis("off")
+    plt.text(0.05, 0.5,
+             "Das Programm hilft Ihnen über ein Karteikartensystem\n"
+             "das Fach Verkehrswegebau zu lernen.\n"
+             "Dazu wird Ihnen eine Frage gestellt, für dessen Beantwortung\n" 
+             "wir Ihnen vier Antwortmöglichkeiten zur Verfügung stellen.\n\n"
+             "Klicken Sie in das Fenster, um Ihre Auswahl zu treffen.",
+             ha="left", va="center", fontsize="larger")
+    plt.ginput(timeout=0)
+    plt.close()
+
+
+# Macht die Oberfläche für das Auswählen des Stapels
+def Auswahl_des_Stapels():
+    plt.figure("Auswahl des zu lernenden Stapels", figsize=[7, 5])
+    plt.axis("off")  
+    plt.text(0.03, 1,"        " "Wählen Sie den Stapel aus, den Sie lernen"
+            " wollen\n", ha="left", va="top", fontsize="larger")
+
+    axButton1 = plt.axes([0.15, 0.1, 0.3, 0.1])
+    Button1 = Button(axButton1, "Lernen beginnen")
+    Button1.on_clicked(Lernen_beginnen)
+
+    plt.text(0, 5.5, "               " "Diese hier sind die auswählbaren"
+             " Stapel\n",fontsize="larger")
+
+    global RadioButton1
+
+    global Labels1 
+    Labels1 = ["Stapel 1 (schwer)" "                 "
+               f"verfügbare Fragen: {len(Fach1)}" ,
+              "Stapel 2 (schwer-mittel)" "       " 
+              f"verfügbare Fragen: {len(Fach2)}",
+              "Stapel 3 (mittel)" "                   "
+              f"verfügbare Fragen: {len(Fach3)}",
+              "Stapel 4 (mittel-einfach)" "      " 
+              f"verfügbare Fragen: {len(Fach4)}",
+              "Stapel 5 (einfach)" "                 "
+              f"verfügbare Fragen: {len(Fach5)}",\
+              "Alle Fragen" "                           "
+              f"verfügbare Fragen: {len(Einträge)}"]
+
+    
+    axRadioButton1 = plt.axes([0.15, 0.22, 0.7, 0.45])
+    RadioButton1 = RadioButtons(axRadioButton1, Labels1, active=0)
+
+    axButton6 = plt.axes([0.6, 0.1, 0.25, 0.1])
+    Button_Karteikarte_hinzufügen = Button(axButton6, 
+                                           "Karteikarte hinzufügen")
+    Button_Karteikarte_hinzufügen.on_clicked(Karteikarte_hinzufügen)
+
+    plt.show()
+
+
+# wird ausgeführt, wenn nach dem Stapel auswählen das Lernen gestartet werden soll (Button "Lernen starten" wurde gedrückt)
+def Lernen_beginnen(event):
+    global Stapel_Auswahl
+    Stapel_Auswahl = Labels1.index(RadioButton1.value_selected)
+    plt.close()
+
+
+def abbrechen(event):
+    plt.close()
+    Auswahl_des_Stapels()
+
+
+neue_Karteikarte = []
+
+# Eingaben für die Antworten werden ausgelesen und in eine Liste hinzugefügt 
+def einfügen(event):
+
+    Antwort1 = TextBox2.text
+    Abfrage2 = Antwort1.find("ß")
+    Antwort2 = TextBox3.text
+    Abfrage3 = Antwort2.find("ß")
+    Antwort3 = TextBox4.text
+    Abfrage4 = Antwort3.find("ß")
+    Antwort4 = TextBox5.text
+    Abfrage5 = Antwort4.find("ß")
+
+    if Abfrage2 == -1 and Abfrage3 == -1 and Abfrage4 == -1 \
+        and Abfrage5 == -1:
+
+        neue_Karteikarte.append(Antwort1)
+        neue_Karteikarte.append(Antwort2)
+        neue_Karteikarte.append(Antwort3)
+        neue_Karteikarte.append(Antwort4)
+
+        neue_Karteikarte.append(str(Labels_Antwortmöglichkeiten.index
+            (RadioButton3.value_selected)))                            # richtige Antwort wird über den Index hinzugefügt
+        neue_Karteikarte.append("1")                                   # 1 wird hinzugefügt, damit die Frage im 1. Stapel landet
+
+        plt.close()
+
+        plt.figure("Information", figsize = [8, 1])
+        plt.axis("off")
+        plt.text(0.05, 1,
+                 "Die neu hinzugefügte Frage wird erst beim Neustart"
+                 " des Programms abgefragt.\n"
+                 "Klicken Sie in das Fenster, um es zu schließen."
+                 ,ha="left", va="top", fontsize="larger")
+        plt.ginput(timeout=0)
+        plt.close()
+
+        Auswahl_des_Stapels()
+
+    else: 
+        plt.figure("Fehlermeldung", figsize = [8, 1])
+        plt.axis("off")
+        plt.text(0.05, 1,
+                 "In einer Ihrer Antworten befindet sich ein 'ß'. Dies ist"
+                 "nicht erlaubt.\n"
+                 "Klicken Sie in das Fenster, um es zu schließen und"
+                 " bearbeiten Sie ihre Antwort!"
+                 ,ha="left", va="top", fontsize="larger")
+        plt.ginput(timeout=0)
+        plt.close()
+
+    
+
+# wird ausgeführt wenn die Frage geschrieben wurde und der Button "bestätigen" gedrückt wurde  
+def bestätigen(event):
+
+    Frage1 = TextBox1.text              # liest die Textbox aus
+    Abfrage1 = Frage1.find("ß")         # " and "ü" " in die Klammer schreiben, dann kann man nach mehr suchen. Text müsste angepasst werden
+
+    if Abfrage1 == -1:
+
+        plt.close()
+        neue_Karteikarte.append(Frage1)
+
+        plt.figure("Antworten hinzufügen", figsize = [15, 7])
+        plt.axis("off")
+        plt.text(0.05, 1,
+                    "In diese Textfelder können Sie ihre" 
+                    "Antwortmöglichkeiten einfügen" 
+                    ,ha="left", va="top", fontsize="larger")
+
+        plt.text(0, 0.38,
+                    "Geben Sie an, welches die richtige Antwort ist:"
+                    ,ha="left", va="top", fontsize="larger")
+
+        axTextBox2 = plt.axes([0.15, 0.75, 0.8, 0.05])      
+        global TextBox2
+        TextBox2 = TextBox(axTextBox2, "Antwort 1:")
+
+        axTextBox3 = plt.axes([0.15, 0.65, 0.8, 0.05])      
+        global TextBox3
+        TextBox3 = TextBox(axTextBox3, "Antwort 2:")
+
+        axTextBox4 = plt.axes([0.15, 0.55, 0.8, 0.05])      
+        global TextBox4
+        TextBox4 = TextBox(axTextBox4, "Antwort 3:")
+
+        axTextBox5 = plt.axes([0.15, 0.45, 0.8, 0.05])      
+        global TextBox5
+        TextBox5 = TextBox(axTextBox5, "Antwort 4:")
+
+        global Labels_Antwortmöglichkeiten
+        Labels_Antwortmöglichkeiten = ["Antwort 1", "Antwort 2", "Antwort 3",
+            "Antwort 4",]
+
+        global RadioButton3
+        axRadioButton3 = plt.axes([0.15, 0.05, 0.2, 0.3])
+        RadioButton3 = RadioButtons(axRadioButton3, 
+                                    Labels_Antwortmöglichkeiten, active=0)
+
+        axButton7 = plt.axes([0.7, 0.1, 0.2, 0.1])
+        Button_einfügen = Button(axButton7, "einfügen")
+        Button_einfügen.on_clicked(einfügen)
+
+        axButton8 = plt.axes([0.4, 0.1, 0.2, 0.1])
+        Button_abbrechen = Button(axButton8, "abbrechen")
+        Button_abbrechen.on_clicked(abbrechen)
+
+        plt.show()
+    else: 
+        plt.figure("Fehlermeldung", figsize = [8, 1])
+        plt.axis("off")
+        plt.text(0.05, 1,
+                 "In Ihrer Frage befindet sich ein 'ß'. Dies ist nicht" 
+                 " erlaubt.\n"
+                 "Klicken Sie in das Fenster, um es zu schließen und"
+                 " bearbeiten Sie ihre Frage!"
+                 ,ha="left", va="top", fontsize="larger")
+        plt.ginput(timeout=0)
+        plt.close()
+
+
+# wenn beim Stapel auswählen eine neue Frage hinzugefügt werden soll und auf den Button "Karteikarte hinzufügen" gedrückt wurde
+def Karteikarte_hinzufügen(event):
+    plt.close()
+    plt.figure("Frage hinzufügen", figsize = [15, 2.5])
+    plt.axis("off")
+    plt.text(0.05, 0.95,
+             "In dieses Textfeld können Sie ihre Frage einfügen"
+             ,ha="left", va="top", fontsize="larger")
+
+    axTextBox1 = plt.axes([0.15, 0.6, 0.8, 0.1])      
+    global TextBox1
+    TextBox1 = TextBox(axTextBox1, "Frage:")
+
+    axButton7 = plt.axes([0.7, 0.1, 0.2, 0.1])
+    Button_bestätigen = Button(axButton7, "Bestätigen")
+    Button_bestätigen.on_clicked(bestätigen)
+
+    axButton8 = plt.axes([0.2, 0.1, 0.2, 0.1])
+    Button_abbrechen = Button(axButton8, "abbrechen")
+    Button_abbrechen.on_clicked(abbrechen)
+
+    plt.show()
+
+
+# Listen vorbereiten 
+Einträge = []
+
+Fach1 = []
+Fach1_Fragen = []
+
+Fach2 = []
+Fach2_Fragen = []
+
+Fach3 = []
+Fach3_Fragen = []
+
+Fach4 = []
+Fach4_Fragen = []
+
+Fach5 = []
+Fach5_Fragen = []
+
+# öffnet die Datei mit den Karteikarten und packt die in eine Liste. Gleichzeitig werden die Fragen und Fragenanzahl ausgeteilt
+with open ("Karteikarten.txt", "r", encoding = "utf-8") as KK:
+    Inhalt = KK.read() 
+    Zeilen = Inhalt.split("\n")
+
+    for z in range(0, len(Zeilen)):           
+        Zeile = Zeilen[z].split(";")
+        Einträge.append(Zeile)
+        alle_Fragen = Einträge.copy()
+
+        if Einträge[z][-1] == "1":             # ab hier werden die einzelnen Fragen/Fragenanzahl aufgeteilt
+            Fach1.append(Einträge[z][-1])
+            Fach1_Fragen.append(Einträge[z])
+
+        elif Einträge[z][-1] == "2":
+            Fach2.append(Einträge[z][-1])
+            Fach2_Fragen.append(Einträge[z])
+
+        elif Einträge[z][-1] == "3":
+            Fach3.append(Einträge[z][-1])
+            Fach3_Fragen.append(Einträge[z])
+
+        elif Einträge[z][-1] == "4":
+            Fach4.append(Einträge[z][-1])
+            Fach4_Fragen.append(Einträge[z])
+
+        elif Einträge[z][-1] == "5":
+            Fach5.append(Einträge[z][-1])
+            Fach5_Fragen.append(Einträge[z])
+
+# Die Einleitung und die Auswahl des Stapels werden hier ausgeführt
+Einleitung()
+Auswahl_des_Stapels()
+
+Stapel_gewählt = []
+
+if Stapel_Auswahl == 0:                     # Wählt durch die Auswahl des Stapels am Anfang aus, welche Fragen gestellt werden
+    Stapel_gewählt = Fach1_Fragen
+
+elif Stapel_Auswahl == 1:
+    Stapel_gewählt = Fach2_Fragen
+
+elif Stapel_Auswahl == 2:
+    Stapel_gewählt = Fach3_Fragen
+
+elif Stapel_Auswahl == 3:
+    Stapel_gewählt = Fach4_Fragen
+
+elif Stapel_Auswahl == 4:
+    Stapel_gewählt = Fach5_Fragen
+
+elif Stapel_Auswahl == 5:
+    Stapel_gewählt = Einträge
+
+
+
+gewusste_Fragen = []
+richtig_counter = 0
+falsch_counter = 0
+Fragen_counter = 0
+
+Sitzung = True 
+Überprüfung = False
+
+# Überprüft ob die Frage richtig oder falsch war. Hier werden auch die Stapelnummern aktualisiert und markiert, ob eine Frage schonmal falsch beantwortet wurde
+def überprüfen(event):
+    global Antwortsnummer
+    global Überprüfung
+    global richtig_counter
+    global falsch_counter
+    global Fragen_counter
+    global gewusste_Fragen
+
+    Antwortsnummer = Labels_Antworten.index(RadioButton2.value_selected)
+
+    if Antwortsnummer == int(Stapel_gewählt[j][5]): # richtig beantwortet
+
+        if Stapel_gewählt[j][-1] == "0":         # Frage richtig, ABER wurde schonmal falsch beantwortet
+            richtig_counter = richtig_counter + 1
+            Fragen_counter = Fragen_counter + 1
+
+            del Stapel_gewählt[j][-1]
+            del Stapel_gewählt[j][-1]
+            Stapel_gewählt[j].append(str(1))
+            gewusste_Fragen.append(Stapel_gewählt[j])
+            del Stapel_gewählt[j]
+
+
+            plt.figure("Lösung", figsize=[7, 1.5])
+            plt.axis("off")
+            plt.text(0.1, 0.25, "Ihre Antwort ist korrekt!\n"
+                        "Da die Frage aber schonmal falsch beantwortet"
+                        "wurde,\n" 
+                        "wird sie in den ersten Stapel getan.\n\n"
+                        "Klicken Sie in das Fenster, um Ihre Auswahl zu"
+                        "treffen.")
+            plt.ginput(timeout=0)
+            plt.close()
+            plt.close()
+
+        elif Stapel_gewählt[j][-1] != "0":          # Frage richtig UND Frage ist noch nicht falsch beantwortet worden
+
+            if int(Stapelwert) == 5:                # Frage war schon im 5. Stapel
+                richtig_counter = richtig_counter + 1
+                Fragen_counter = Fragen_counter + 1
+
+                del Stapel_gewählt[j][-1]
+                Stapel_gewählt[j].append(str(5))
+                gewusste_Fragen.append(Stapel_gewählt[j])
+                del Stapel_gewählt[j]
+
+                plt.figure("Lösung", figsize=[7, 1.5])
+                plt.axis("off")
+                plt.text(0.1, 0.25, "Ihre Antwort ist korrekt!\n"
+                            "Die Frage bleibt in dem höchsten Stapel.\n\n"
+                            "Klicken Sie in das Fenster, um Ihre Auswahl zu"
+                            "treffen.")
+                plt.ginput(timeout=0)
+                plt.close()
+                plt.close()
+
+            elif int(Stapelwert) < 5:           # Frage war in einem Stapel, der nicht 5 war
+                neuer_Stapelwert = int(Stapelwert) + 1
+                richtig_counter = richtig_counter + 1
+                Fragen_counter = Fragen_counter + 1
+
+                del Stapel_gewählt[j][-1]
+                Stapel_gewählt[j].append(str(neuer_Stapelwert))
+
+                gewusste_Fragen.append(Stapel_gewählt[j])
+                del Stapel_gewählt[j]
+
+                plt.figure("Lösung", figsize=[7, 1.5])
+                plt.axis("off")
+                plt.text(0.1, 0.25, "Ihre Antwort ist korrekt!\n"
+                            "Somit wird diese Frage in den höheren Stapel.\n"
+                            "eingestuft.\n\n"
+                            "Klicken Sie in das Fenster, um Ihre Auswahl zu"
+                            "treffen.")
+                plt.ginput(timeout=0)
+                plt.close()    
+                plt.close()
+   
+    elif Antwortsnummer != int(Stapel_gewählt[j][5]): # Frage falsch beantwortet
+        plt.close()
+        if Stapel_gewählt[j][-1] == "0":              # Frage falsch, aber schonmal falsch beantwortet
+            falsch_counter = falsch_counter + 1
+            Fragen_counter = Fragen_counter + 1
+            
+            plt.figure("Lösung", figsize=[5, 2])
+            plt.axis("off")
+            plt.text(0.1, 0.25, "Ihre Antwort ist nicht korrekt.\n"
+                "Die Frage wird damit in dem niedrigsten Stapel\n"
+                "eingestuft.\n\n"
+                "Klicken Sie in das Fenster, um die Lösung zu erfahren.")
+            plt.ginput(timeout=0)
+            plt.close()
+            plt.close()
+            Überprüfung = True
+
+        elif Stapel_gewählt[j][-1] != "0":            # Frage flasch, aber 1. Mal falsch beantwortet, um die 0 hinzuzufügen \\  
+            plt.close()                               # Könnte man zwar zusammenfassen aber ist noch da weil am Anfang auch geuckt wurde ob es in 1 drin ist oder nicht
+            falsch_counter = falsch_counter + 1
+            Fragen_counter = Fragen_counter + 1
+
+            del Stapel_gewählt[j][-1]
+            Stapel_gewählt[j].append("1")
+            Stapel_gewählt[j].append("0")
+
+            plt.figure("Lösung", figsize=[5, 2])
+            plt.axis("off")
+            plt.text(0.1, 0.25, "Ihre Antwort ist nicht korrekt.\n"
+                "Die Frage wird damit in dem niedrigsten Stapel\n"
+                "eingestuft.\n\n"
+                "Klicken Sie in das Fenster, um die Lösung zu erfahren.")
+            plt.ginput(timeout=0)
+            plt.close()
+            plt.close()
+            Überprüfung = True
+
+
+          
+        
+# setzt Voraussetzungen, wenn die nächste Frage gewählt wird
+def Nächste_Frage(event):
+    global Sitzung 
+    global Überprüfung
+    Sitzung = True
+    Überprüfung = False
+    plt.close()
+
+# setzt Voraussetzungen, wenn Lernen beendet werden soll
+def beenden(event):
+    global Sitzung
+    global Überprüfung
+    Sitzung = False
+    Überprüfung = False
+    # wenn in Einträge Fragen sind, die schonmal falsch beantwortet wurden muss die 0 geändert werden
+    for f in range(0, len(Stapel_gewählt)):
+        if Stapel_gewählt[f][-1] == "0":
+            del Stapel_gewählt[f][-1]
+    plt.close()
+
+
+# Sucht Frage aus und zeigt die Frage + Antwortmöglichkeiten an 
+while Sitzung == True:                                  # guckt ob auf den Button "Sitzung beenden" gedrückt wurde
+    if len(Stapel_gewählt) > 0:
+        if Überprüfung == False:                        # guckt, ob die Frage schon beantwortet wurde und um dann auszuwählen ob die richtige Antwort angezeigt werden soll
+            j = random.randint(0, len(Stapel_gewählt)-1) # sucht random aus welche Frage des bestimmten Stapels genommen wird ; j = Frage
+            k = j
+            global RadioButton2
+            global Labels_Antworten
+            plt.figure("Fragestellung", figsize=[11, 5])
+            plt.axis("off")
+            plt.text(0, 0.8, "Die Frage lautet:" " "\
+                     f"{Stapel_gewählt[j][0]}" "\n\n" 
+                     "Wählen Sie eine der folgenden Antwortmöglichkeit:")
+            Labels_Antworten = [f"{Stapel_gewählt[j][1]}",
+                                f"{Stapel_gewählt[j][2]}",
+                                f"{Stapel_gewählt[j][3]}",
+                                f"{Stapel_gewählt[j][4]}"]                  # Das sind die Antwortmöglichkeiten 
+
+            axRadioButton2 = plt.axes([0.1, 0.22, 0.8, 0.45])                       # Stellt die Radiobutton für die Antworten
+            RadioButton2 = RadioButtons(axRadioButton2, Labels_Antworten,
+               active=0)
+
+            Stapelwert = Stapel_gewählt[j][6]
+
+        elif Überprüfung == True:                                       # Falls die Frage schon beantwortet wurde, aber falsch war, wird hier die Lösung gegeben
+            j = k
+            plt.figure("Fragestellung", figsize=[11, 5])
+            plt.axis("off")
+            plt.text(0, 0.8, "Die Frage lautete:" " "
+                    f"{Stapel_gewählt[j][0]}" "\n\n" 
+                    "Die richtige Antwort wäre:")
+
+            Labels_Antworten = [f"{Stapel_gewählt[j][1]}",
+                                f"{Stapel_gewählt[j][2]}",
+                                f"{Stapel_gewählt[j][3]}",
+                                f"{Stapel_gewählt[j][4]}"]                  # Das sind die Antwortmöglichkeiten 
+
+            axRadioButton2 = plt.axes([0.1, 0.22, 0.8, 0.45])                       # Stellt die Radiobutton für die Antworten
+            RadioButton2 = RadioButtons(axRadioButton2, Labels_Antworten,
+               active = int(Stapel_gewählt[j][-3]))
+
+            Stapelwert = Stapel_gewählt[j][6]
+
+        if Überprüfung == False:
+            axButton2 = plt.axes([0.4, 0.1, 0.2, 0.1])
+            Button_überprüfen = Button(axButton2, "Überprüfen")
+            Button_überprüfen.on_clicked(überprüfen)
+
+            axButton5 = plt.axes([0.1, 0.1, 0.2, 0.1])
+            Button_beenden = Button(axButton5, "Sitzung beenden")
+            Button_beenden.on_clicked(beenden)
+
+        elif Überprüfung == True:
+            axButton3 = plt.axes([0.7, 0.1, 0.2, 0.1])
+            Button_nächste_Frage = Button(axButton3, "Nächste Frage")
+            Button_nächste_Frage.on_clicked(Nächste_Frage)
+
+            axButton4 = plt.axes([0.1, 0.1, 0.2, 0.1])
+            Button_beenden = Button(axButton4, "Sitzung beenden")
+            Button_beenden.on_clicked(beenden)
+
+        plt.show()
+
+    elif len(Stapel_gewählt) == 0:          # wenn der ausgewählte Stapel keine Fragen mehr hat
+        Sitzung = False
+        plt.figure("Ende", figsize=[7, 1])
+        plt.axis("off")
+        plt.text(0.1, 0.25, "Sie haben alle Fragen bearbeitet.\n"
+                    "Im Folgenden bekommen Sie ihre Auswertung.\n\n"
+                    "Klicken Sie in das Fenster, um Ihre Auswertung zu"
+                    "bekommen.")
+        plt.ginput(timeout=0)
+        plt.close()
+
+
+# neue Fragen zu allen Fragen hinzufügen
+for i in range(0, int(len(neue_Karteikarte)/7)):
+    Zwischenspeicher = []
+    for j in range(i*7, (i+1)*7):
+        Zwischenspeicher.append(neue_Karteikarte[j])
+    alle_Fragen.append(Zwischenspeicher)
+    del Zwischenspeicher
+
+
+# gucken wie viele Fragen in welchem Stapel sind 
+Stapel1 = 0
+Stapel2 = 0
+Stapel3 = 0
+Stapel4 = 0
+Stapel5 = 0
+
+# gucken wie viele Fragen in welchem Stapel sind 
+for st in range(0, len(alle_Fragen)):
+    if alle_Fragen[st][-1] == "1":
+        Stapel1 = Stapel1 + 1
+    elif alle_Fragen[st][-1] == "2":
+        Stapel2 = Stapel2 + 1
+    elif alle_Fragen[st][-1] == "3":
+        Stapel3 = Stapel3 + 1
+    elif alle_Fragen[st][-1] == "4":
+        Stapel4 = Stapel4 + 1
+    elif alle_Fragen[st][-1] == "5":
+        Stapel5 = Stapel5 + 1
+
+# schreibt die Fragen und ihre geänderten Werte in die Datei und überschreibt sie
+with open ("Karteikarten.txt", "w", encoding = "utf-8") as KKN:
+    for n in range(0, len(alle_Fragen)): 
+        for m in range(0, 7):
+            KKN.write(alle_Fragen[n][m])
+            if m < 6:                       # macht ein Semicolon hinter jeden Eintrag, bis auf hinter den letzten
+                KKN.write(";")
+            elif m == 6 and n <= len(alle_Fragen) - 2:
+                KKN.write("\n")
+
+# kurze Auswertung der Lernsitzung
+plt.figure("Auswertung der heutigen Lernphase")
+plt.axis("off")
+plt.text(0.05, 0.5,
+            "In der heutigen Lernsitzung haben sie" " " f"{Fragen_counter}"
+            " " "Frage(n)" "\n"
+            "beantwortet.\n"
+            "Von diesen Frage(n) haben Sie" " " f"{richtig_counter}" " "
+            "richtig" "\n"
+            "und" " " f"{falsch_counter}" " " "Frage(n) falsch beantwortet."
+            "\n\n"
+            "Somit sind nun: \n"
+            f"{Stapel1}" " " "im ersten Fach" "\n"
+            f"{Stapel2}" " " "im zweiten Fach" "\n"
+            f"{Stapel3}" " " "im dritten Fach" "\n"
+            f"{Stapel4}" " " "im vierten Fach und" "\n"
+            f"{Stapel5}" " " "im fünften Fach." "\n\n"
+            "Klicken Sie in das Fenster, um das Programm zu beenden",
+            ha="left", va="center", fontsize="larger")
+plt.ginput(timeout=0)
+plt.close()
