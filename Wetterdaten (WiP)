@@ -1,0 +1,223 @@
+import os
+import requests
+import matplotlib.pyplot as plt
+from matplotlib.widgets import TextBox, Button, CheckButtons, RadioButtons
+from datetime import datetime as dt
+
+#Hier wird die Erklärung mit einer Funktion schonmal hergestellt und wird 
+#danach nur noch aufgerufen und damit ausgeführt
+
+              ### Erklärung
+
+def Erklaerung():
+    # Macht ein Fenster, dass einen bestimmten Namen tragen soll
+    plt.figure("Grafische Aufbereitung von Wetterdaten")
+
+    # sorgt dafür, dass man kein Koordinatensystem hat
+    plt.axis("off")
+    # macht einen Text mit Eckkoordinaten (x, y) und positiniert
+    # das ganze richtig, mit größerer Schriftgröße
+    plt.text(0.05, 0.5,
+             "Das Programm erzeugt Diagramme mit aktuellen\n"
+             "Wetterdaten der letzten Tage.\n"
+             "Geben Sie an, für welche Messwerte die Diagramme\n"
+             "angezeigt werden sollen und wie viele Tage\n"
+             "berücksichtigt werden sollen.\n\n"
+             "Klicken sie HIER, um Ihre Auswahl zu treffen",
+             ha="left", va="center", fontsize="larger")
+    # Schließt das Fenster sobald man etwas drückt
+    plt.ginput(timeout=0)
+    plt.close()
+
+              ### Voreinstellungen
+
+def Einstellung():
+    plt.figure("Grafische Aufbereitung von Wetterdaten")
+    plt.axis("off")  
+    plt.text(0.03, 1, "1)   Geben Sie die Anzahl der Tage ein:\n"
+             "                  (Max. 365 Tage)\n", 
+             ha="left", va="top", fontsize="larger")
+
+    axTextBox = plt.axes([0.8, 0.825, 0.05, 0.05])      
+    global TextBox1
+    TextBox1 = TextBox(axTextBox, "Tage", label_pad=0.5)
+
+    axButton1 = plt.axes([0.35, 0.1, 0.3, 0.1])
+    Button1 = Button(axButton1, "Weiter zum Plotten")
+    Button1.on_clicked(Weiter)
+
+    plt.text(-0.7, 6, " 2)   Wählen Sie eine der Folgenden Messwerte aus:\n"
+             "                    (Max. 1 Auswahl treffen)",\
+             fontsize="larger")
+
+    global RadioButton1
+
+    global Labels1 
+    Labels1 = ["Stickstoffmonoxid (NO)", "Stickstoffdioxid (N02)",\
+               "Ozon (O3)", "Partikel (PM 10)", "Schwefeldioxid (SO2)",\
+               "Temperatur", "Relative Luftfeuchtigkeit",\
+               "Windgeschwindigkeit", "Windrichtung"]
+
+    
+    axRadioButton1 = plt.axes([0.3, 0.22, 0.4, 0.45])
+    RadioButton1 = RadioButtons(axRadioButton1, Labels1, active=0)
+
+    plt.show()
+
+
+def Weiter(event):
+    Update(TextBox1.text)
+    
+       
+def Update(Text):
+    try:
+       Tage = int(Text)
+       if Tage > 365 or Tage == 0 or Text == "":
+              plt.figure("Fehlermeldung", figsize=[7,0.7])
+              plt.axis("off")
+              plt.text(0, 0.5, "Sie haben mehr als 365 Tage oder"\
+                       " den Wert 0 ausgewählt!\n",\
+                      fontsize="larger", color="red")
+              plt.text(0, 0.1,\
+                      "Drücken Sie eine beliebeige Taste, um fortzufahren.")
+              plt.ginput(timeout=0)
+              plt.close()
+       else:
+              global TB_Tage
+              TB_Tage = Tage
+              global MW
+              MW = Labels1.index(RadioButton1.value_selected)
+              plt.close()
+    except ValueError:
+              plt.figure("Fehlermeldung", figsize=[7,0.7])
+              plt.axis("off")
+              plt.text(0, 0.5, "Sie haben keine Zahl eigegeben!",\
+                      fontsize="larger", color="red")
+              plt.text(0, 0.1,\
+                      "Drücken Sie eine beliebeige Taste, um fortzufahren")
+              plt.ginput(timeout=0)
+              plt.close()
+
+
+Links = ["https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/NO_AM1H.csv",
+         "https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/NO2_AM1H.csv",
+         "https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/O3_AM1H.csv",
+         "https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/PM10F_GM24H.csv",
+         "https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/SO2_AM1H.csv",
+         "https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/T_AM1H.csv",
+         "https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/F_AM1H.csv",   
+         "https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/WG_SM1H.csv",
+         "https://www.lanuv.nrw.de/fileadmin/lanuv/luft/temes/WR_VM1H.csv"]
+
+Colors = ["Black", "bisque", "forestgreen", "slategrey", "darkorange",\
+        "limegreen", "burlywood", "darkgreen", "cornflowerblue",\
+        "tan",
+        "royalblue", "lime", "seagreen", "midnightblue", "gray",\
+        "navy", "springgreen", "orange", "blue", "aquamarine",\
+        "turquoise", "slateblue", "darkgoldenrod", "gold", "brown",\
+        "mediumpurple", "teal", "plum", "lightcoral", "maroon",\
+        "rosybrown", "indigo", "red", "darkkhaki", "mediumorchid",\
+        "cyan", "violet", "olive", "salmon", "yellowgreen",\
+        "yellow", "magenta", "deepskyblue", "orangered", "sienna",\
+        "chocolate", "olivedrab", "steelblue", "orchid", "fuchsia",\
+        "crimson", "lawngreen", "saddlebrown", "deeppink", "peru",\
+        "darkred", "darkolivegreen", "chartreuse"] 
+        
+Erklaerung()
+Einstellung()
+
+
+# Ab hier sind alle Voreinstellungen getroffen worden und es kann das 
+# Programm zur Sortierung und zum Plotten beginnen
+
+              ### Hauptprogramm
+
+Link_T = requests.get(Links[MW])
+
+open(f"{os.path.abspath(os.getcwd())}\Datei.csv", "wb").write(Link_T.content)
+
+with open("Datei.csv", "r", encoding ="latin1") as T:
+    
+        Zeilen_T = []
+        Zeilen_T1 = []
+        Zeilen_T2 = []
+        Inhalt_T = T.read()
+        Zeilen_T = Inhalt_T.split("\n")
+        Zeilen_T1 = [item.replace(",", ".") for item in Zeilen_T]
+        Zeilen_T2 = [item.replace("<4", "4").replace("<7", "7")\
+                .replace("<10", "10") for item in Zeilen_T1]
+        
+        Anzahl_Stationen =[58, 58, 29, 56, 9, 24, 24, 34, 34] 
+
+        Daten = []
+        Auswahl = []
+
+        Liste_x = []
+        Liste_y = []
+
+        Zeilen_T2.reverse()
+
+Liste_y = [[] for x in range(Anzahl_Stationen[MW]+2)]
+
+for q in range(1,TB_Tage*24+1):
+    Auswahl.append(Zeilen_T2[q])
+
+for w in range(len(Auswahl)):
+      Listenzahl = 0
+      eintrag = Auswahl[w].split(";")
+
+      for e in eintrag:
+        try:
+             Liste_y[Listenzahl].append(float(e))
+             
+        except ValueError:
+             Liste_y[Listenzahl].append(None)
+        
+        Listenzahl += 1
+
+
+for r in range(1,TB_Tage*24+1):
+      Daten.append(Zeilen_T2[r].split(";"))
+Daten.reverse()
+      
+for Datum, Uhrzeit, *Messwert in Daten:
+        if Uhrzeit == "24:00":
+              Uhrzeit = "23:59"  
+        Liste_x.append(dt.strptime(f"{Datum} {Uhrzeit}",\
+                                   "%d.%m.%Y %H:%M"))
+
+Messwert.clear()
+Liste_y.pop(0)
+Liste_y.pop(0)
+
+for t in range(len(Liste_y)):
+      Liste_y[t].reverse()
+
+fig, ax = plt.subplots()   
+Groese = plt.get_current_fig_manager()
+Groese.window.state("zoomed")
+
+for z in range(len(Liste_y)):
+      Plot = ax.plot(Liste_x, Liste_y[z], linewidth=2, color=Colors[z])
+
+plt.subplots_adjust(left=0.2)
+plt.grid(True)
+plt.legend(bbox_to_anchor=(0.97, 1.15))
+plt.title(f"{Labels1[MW]} - Messwerte der letzten {TB_Tage} Tage")
+plt.ylabel("Messwert")
+plt.xlabel("Datum")
+plt.xticks(Liste_x[::10])
+fig.autofmt_xdate(rotation=90)
+
+
+def Beenden(event):
+        plt.savefig(format="pdf", fname="Plot von Messwerten.pdf")
+        plt.close()
+
+axButton_Schließen = plt.axes([0.85, 0.01, 0.05, 0.03])
+Button_Schließen = Button(axButton_Schließen, "Schließen")
+Button_Schließen.on_clicked(Beenden)
+    
+plt.show()
+
+   
