@@ -1,0 +1,59 @@
+from random import randint
+
+print("Im Folgenden wird für Sie eine zufällige Zahl zwischen 1 und 100 ausgesucht. \n"
+      "Ihre Aufageb besteht nur darin in maximal 10 Versuchen die zufällig generierte Zahl \n"
+      "zu erraten. Viel Erfolg!")
+
+
+Ratezahl = randint(1, 1000)
+erraten = False
+Versuche = 0
+
+
+while Versuche <= 9:
+    eingegeben = int(input("Geben Sie nun ihr Ergebnis ein:"))
+
+    if eingegeben not in range(1, 1000):
+        print("Diese Zahl liegt nicht in dem vorgegebenen Bereich. Suchen Sie eine andere Zahl aus")
+        del eingegeben
+    else:      
+        if eingegeben == Ratezahl:
+            erraten = True
+            print("Sie haben die zufällig generierte Zahl richtig erraten!")
+            break
+
+        elif eingegeben < Ratezahl:
+            print("Ihre Lösung ist kleiner als die generierte Zahl")
+            Versuche += 1
+            del eingegeben
+
+        elif eingegeben > Ratezahl:
+            print("Ihre Lösung ist größer als die generierte Zahl")
+            Versuche += 1
+            del eingegeben
+
+unten = 1
+oben = 1000
+Möglichkeiten = 0
+
+while Möglichkeiten <=10:
+    Loesung_Eingabe = int((unten + oben) / 2)
+    if Loesung_Eingabe == Ratezahl:
+        Möglichkeiten += 1
+        break
+
+    elif Loesung_Eingabe < Ratezahl:
+            Möglichkeiten +=1
+            del unten
+            unten = Loesung_Eingabe + 1
+    
+    elif Loesung_Eingabe > Ratezahl:
+            Möglichkeiten +=1
+            del oben
+            oben = Loesung_Eingabe - 1
+
+
+
+print("\n"
+      "Sie haben all Ihre Versuche aufgebraucht. \n"
+      "Die gesuchte Zahl war", Ratezahl, "und konnte in", Möglichkeiten, "erraten werden.")
